@@ -217,7 +217,7 @@ namespace DisqusToGithubIssues
                 }
 
                 var newIssue = new NewIssue(issueTitle);
-                newIssue.Body = $@"Written on {thread.CreatedAt} 
+                newIssue.Body = $@"Imported 
 
 URL: {thread.Url}
 ";
@@ -228,13 +228,13 @@ URL: {thread.Url}
 
                 foreach (var post in thread.Posts)
                 {
-                    var message = $@"Comment written by **{post.Author}** on **{post.CreatedAt}**
+                    var message = $@"Imported comment written by **{post.Author}** on **{post.CreatedAt.ToString("s")}**
 
 {post.Message}
 ";
 
                     var comment = await client.Issue.Comment.Create(repoOwner, repoName, issue.Number, message);
-                    Console.WriteLine($"New comment by {post.Author} at {post.CreatedAt}");
+                    Console.WriteLine($"New comment by {post.Author} at {post.CreatedAt.ToString("s")}");
                     await Task.Delay(1000 * 5);
                 }
             }
