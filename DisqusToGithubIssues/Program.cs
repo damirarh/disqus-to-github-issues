@@ -41,8 +41,8 @@ namespace DisqusToGithubIssues
                 nsmgr.AddNamespace("def", "http://disqus.com");
                 nsmgr.AddNamespace("dsq", "http://disqus.com/disqus-internals");
 
-                IEnumerable<Thread> threads = await FindThreads(doc, nsmgr);
                 IEnumerable<Post> posts = FindPosts(doc, nsmgr);
+                IEnumerable<Thread> threads = await FindThreads(doc, nsmgr, posts);
 
                 Console.WriteLine($"{threads.Count()} valid threads found");
                 Console.WriteLine($"{posts.Count()} valid posts found");
@@ -60,7 +60,7 @@ namespace DisqusToGithubIssues
             Console.ReadKey();
         }
 
-        private static async Task<IEnumerable<Thread>> FindThreads(XmlDocument doc, XmlNamespaceManager nsmgr)
+        private static async Task<IEnumerable<Thread>> FindThreads(XmlDocument doc, XmlNamespaceManager nsmgr, IEnumerable<Post> posts)
         {
             var xthreads = doc.DocumentElement.SelectNodes("def:thread", nsmgr);
 
@@ -74,7 +74,7 @@ namespace DisqusToGithubIssues
                 var isDeleted = xthread["isDeleted"].NodeValue<bool>();
                 var isClosed = xthread["isClosed"].NodeValue<bool>();
                 var url = xthread["link"].NodeValue();
-                var isValid = await CheckThreadUrl(url);
+                var isValid = await CheckThreadUrl(url, threadId, posts);
 
                 Console.WriteLine($"{i:###} Found thread ({threadId}) '{xthread["title"].NodeValue()}'");
 
@@ -107,10 +107,15 @@ namespace DisqusToGithubIssues
             return threads;
         }
 
-        private static async Task<bool> CheckThreadUrl(string url)
+        private static async Task<bool> CheckThreadUrl(string url, long threadId, IEnumerable<Post> posts)
         {
-            if (!url.StartsWith("http://asp.net-hacker.rocks") &&
-               !url.StartsWith("https://asp.net-hacker.rocks"))
+            if (!url.StartsWith("http://www.damirscorner.com") &&
+               !url.StartsWith("https://www.damirscorner.com"))
+            {
+                return false;
+            }
+
+            if (!posts.Any(p => p.ThreadId == threadId))
             {
                 return false;
             }
