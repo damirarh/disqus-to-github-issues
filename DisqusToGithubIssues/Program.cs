@@ -126,11 +126,11 @@ namespace DisqusToGithubIssues
                 var response = await client.GetAsync(url);
 
                 var valid = (response.StatusCode == HttpStatusCode.OK);
-                
+
                 if(!valid){
                     Console.WriteLine($"url {url} not valid because http response status is {response.StatusCode}");
                 }
-                
+
                 return valid;
             }
             catch (Exception ex)
@@ -204,17 +204,19 @@ namespace DisqusToGithubIssues
             var issues = await client.Issue.GetAllForRepository(repoOwner, repoName);
             foreach (var thread in threads)
             {
-                if(thread.Posts.Count == 0)
+                var issueTitle = new Uri(thread.Url).AbsolutePath;
+
+                if (thread.Posts.Count == 0)
                 {
                     continue;
                 }
 
-                if (issues.Any(x => !x.ClosedAt.HasValue && x.Title.Equals(thread.Title)))
+                if (issues.Any(x => !x.ClosedAt.HasValue && x.Title.Equals(issueTitle)))
                 {
                     continue;
                 }
 
-                var newIssue = new NewIssue(thread.Title);
+                var newIssue = new NewIssue(issueTitle);
                 newIssue.Body = $@"Written on {thread.CreatedAt} 
 
 URL: {thread.Url}
