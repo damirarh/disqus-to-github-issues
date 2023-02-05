@@ -6,8 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Web;
+using System.Xml;
 
 namespace DisqusToGithubIssues
 {
@@ -127,7 +127,8 @@ namespace DisqusToGithubIssues
 
                 var valid = (response.StatusCode == HttpStatusCode.OK);
 
-                if(!valid){
+                if (!valid)
+                {
                     Console.WriteLine($"url {url} not valid because http response status is {response.StatusCode}");
                 }
 
